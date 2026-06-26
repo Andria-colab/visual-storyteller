@@ -1,0 +1,21 @@
+# data & artifacts (never commit large binaries)
+data/Images/
+data/*.h5
+data/*.csv
+*.h5
+*.pt
+*.pkl
+checkpoints/
+
+# python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# notebooks: clear outputs before committing (keeps diffs small, avoids conflicts)
+
+# os
+.DS_Store
+Thumbs.db
