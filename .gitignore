@@ -2,10 +2,17 @@
 data/Images/
 data/*.h5
 data/*.csv
+# unzipped Flickr8k dataset (images + captions) and its zip
+caption_data/
+caption_data.zip
 *.h5
 *.pt
 *.pkl
 checkpoints/
+
+# assignment brief / docs exports
+*.docx
+
 
 # python
 __pycache__/
