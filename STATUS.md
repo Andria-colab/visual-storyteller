@@ -1,15 +1,17 @@
 # Project Status — Person 2 (Data, Training & Evaluation)
 
-_Last updated: 26 June 2026 — **PAUSED at a clean checkpoint.**_
+_Last updated: 28 June 2026 — **Code-complete.**_
 
-This document tracks what our half of **The Visual Storyteller** has delivered and
-what we're waiting on. Plain-English companion to the technical `CLAUDE.md`.
+This document tracks what **The Visual Storyteller** has delivered and what's
+left. Plain-English companion to the technical `CLAUDE.md`.
 
-> **Where we paused:** every Person-2 task that can be done without Person 1's
-> model is finished and the smoke test passes (`python -m scripts.smoke_test` →
-> `SMOKE TEST PASSED [OK]`). Nothing is half-built. The next moves are all blocked
-> on Person 1's `model.py` / `features.h5` / encoder transform, or on the Day-2
-> interface freeze. Pick back up from the "Blocked / waiting" section below.
+> **Where we are:** both halves are now implemented and verified end to end — the
+> data/training/eval pipeline (P2) *and* the modeling code (P1: encoder, both
+> decoders, model wrapper, attention viz, feature precompute), plus both
+> notebooks. `python -m scripts.smoke_test` passes and a CPU sanity check
+> confirms the real `EncoderDecoder` is a drop-in for the stub. The only thing
+> left is running the full training on Flickr8k (Colab/GPU) and curating the
+> final qualitative examples.
 
 ---
 
@@ -75,30 +77,27 @@ lands, it plugs in with no changes to our code.
 
 ---
 
-## ⏳ Blocked / waiting
+## ✅ Modeling code (P1) — now implemented
 
-### On Person 1 (modeling)
-| What we need | Why | Impact if late |
-|---|---|---|
-| Real `model.py` (EncoderDecoder) | Replaces the stub we test against | None yet — stub keeps us unblocked; needed before real training |
-| `features.h5` from `precompute_features.py` | Our dataset reads cached image features from it | Can't run real training until it exists |
-| Encoder + image transform attached to the model | `generate_caption` needs them to turn a raw image into features | `generate_caption` can't run on real images until then |
+- **`encoder.py`** — frozen ResNet-50 → `[B,49,2048]` region features, permanently
+  in eval mode (frozen BatchNorm), plus `build_image_transform()` shared by feature
+  precompute and `generate_caption`.
+- **`decoder_lstm.py`** — Show-Attend-and-Tell baseline (LSTM + Bahdanau attention).
+- **`decoder_transformer.py`** — from-scratch Transformer decoder (custom pre-norm
+  layers over `nn.MultiheadAttention`, sinusoidal positions, causal + padding masks,
+  weight-tied output). Init tuned so starting loss ≈ ln(V).
+- **`model.py`** — `EncoderDecoder(vocab_size, cfg, variant)`, a verified drop-in for
+  the smoke-test stub (`forward` / `encode_image` / `decode_step`).
+- **`viz.py`** — per-word attention heatmaps for both decoders.
+- **`scripts/precompute_features.py`** — caches `features.h5` (resumable, GPU).
+- **`notebooks/data_and_training.ipynb`** — data → model → train → curves → save.
 
-### On the Day-2 interface freeze (joint decision with Person 1)
-These are quick agreements that prevent rework — none are hard problems:
-1. **Step API:** confirm the model exposes `decode_step` (our decoder assumes it);
-   if it's a single `forward` instead, we adapt in one spot.
-2. **Feature file keys:** confirm `features.h5` is keyed by image filename.
-3. **Model attributes:** confirm we attach `.vocab`, `.encoder`, `.image_transform`
-   to the model object for `generate_caption`.
+## ⏳ Remaining (needs real data + GPU — the user's run)
 
-### Next on our own plate (not blocked)
-- _(done)_ ~~id-aware validation loader for real BLEU-4 early stopping~~
-- _(done)_ ~~author `notebooks/inference.ipynb`~~
-- Curate the actual success/failure example ids in `inference.ipynb` — needs the
-  trained models to run, so effectively waiting on Person 1.
-- Draft the training section of `data_and_training.ipynb` (loss curves, artifact
-  saving) — can scaffold now against the stub, finalises once the real model lands.
+- Run `data_and_training.ipynb` on Flickr8k to build `features.h5`, train both
+  models, and save `baseline_best.pt` / `transformer_best.pt` / `vocab.pkl`.
+- Curate the actual success/failure example ids and the attention figures in
+  `inference.ipynb` (needs the trained models), and let it write `reports/results.md`.
 
 ---
 

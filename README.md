@@ -17,10 +17,10 @@ src/
   train.py      training loop, masked CE + label smoothing, AMP, checkpoint/resume (P2)
   decode.py     greedy + beam search, generate_caption() entry point             (P2)
   evaluate.py   BLEU-1..4 over all 5 references (NLTK)                            (P2)
-  encoder.py            frozen ResNet-50 -> 49x2048 regions                      (P1)
+  encoder.py            frozen ResNet-50 -> 49x2048 regions + image transform    (P1)
   decoder_lstm.py       LSTM + Bahdanau attention                                (P1)
   decoder_transformer.py  from-scratch Transformer decoder                       (P1)
-  model.py              EncoderDecoder wrapper (shared forward contract)         (P1)
+  model.py              EncoderDecoder wrapper (shared forward contract)          (P1)
   viz.py                attention heatmaps                                        (P1)
 scripts/
   smoke_test.py            end-to-end Phase-1 test with a stub model (no GPU needed)
@@ -32,37 +32,67 @@ reports/
   results.md               metric tables + analysis
 ```
 
-## Setup
+## Install
 
 ```bash
 pip install -r requirements.txt
 ```
 
-NLTK BLEU needs no extra downloads. On a fresh machine, verify the pipeline:
+NLTK BLEU needs no extra downloads. On a fresh machine, verify the pipeline with
+a tiny synthetic dataset + stub model (no GPU or data needed):
 
 ```bash
-python -m scripts.smoke_test
+python -m scripts.smoke_test          # expect: SMOKE TEST PASSED [OK]
 ```
 
-This runs data -> train (with checkpoint/resume) -> decode -> BLEU against a tiny
-synthetic dataset and a stub model. If it prints `SMOKE TEST PASSED`, our half is
-wired correctly and ready for P1's real model to drop in.
+## Data setup
 
-## Data
-
-Place Flickr8k under `data/`:
+The dataset is **Flickr8k** (8,000 images, 5 captions each — the course
+`caption_data.zip`). Unzip it into `data/` so the layout is:
 
 ```
-data/Images/*.jpg
-data/captions.txt          # CSV (image,caption) or the original token format
+data/
+  Images/*.jpg               # ~8k JPEGs, e.g. 1000268201_693b08cb0e.jpg
+  captions.txt               # CSV (image,caption) OR the original token format
+  Flickr_8k.trainImages.txt  # optional — official splits (6k/1k/1k)
+  Flickr_8k.devImages.txt    # optional
+  Flickr_8k.testImages.txt   # optional
 ```
 
-`src/config.py` has `use_local_paths()` (default) and `use_colab_paths()` for the
-Drive layout used during training.
+- `captions.txt` may be either the Kaggle CSV (`image,caption` header) or the
+  original Flickr8k token format (`<img>.jpg#0\tA child ...`) — `data.py` detects both.
+- If the three `Flickr_8k.*Images.txt` split files are present they are used;
+  otherwise a deterministic 6k/1k/1k random split (seed 42) is made. The **test
+  split is held out** until `inference.ipynb`.
+
+Paths come from `src/config.py`: `use_local_paths()` (the default) for the layout
+above, or `use_colab_paths()` for the Google Drive layout used when training on
+Colab (images under `/content/flickr8k`, artifacts under
+`/content/drive/MyDrive/visual_storyteller`).
+
+## How to run (end to end)
+
+```bash
+# 1. cache the frozen ResNet-50 features once (GPU recommended; resumable)
+python -m scripts.precompute_features            # add --colab on Colab
+
+# 2. build vocab + train both models + save artifacts
+#    run notebooks/data_and_training.ipynb  (Restart & Run All)
+
+# 3. demo + success/failure analysis + BLEU comparison table
+#    run notebooks/inference.ipynb          (Restart & Run All)
+```
+
+Training writes checkpoints atomically every epoch to `cfg.checkpoint_dir` and
+keeps the best of each model by validation BLEU-4 at `baseline_best.pt` /
+`transformer_best.pt`. `inference.ipynb` loads those plus `vocab.pkl`, runs the
+graded `generate_caption(image_path, model) -> str`, visualises attention, and
+writes the BLEU table to `reports/results.md`.
 
 ## Status
 
-- [x] `config.py`, `data.py`, `train.py`, `decode.py`, `evaluate.py` (P2)
-- [x] End-to-end smoke test passing
-- [ ] P1: encoder + decoders + model wrapper + feature precompute
-- [ ] Notebooks, full training, metric comparison
+- [x] Data / training / decoding / evaluation pipeline (P2)
+- [x] Encoder + LSTM & Transformer decoders + model wrapper + viz (P1)
+- [x] Feature precompute (`features.h5`)
+- [x] Both notebooks authored; end-to-end smoke test passing
+- [ ] Full training run on Flickr8k + final metric comparison (run the notebooks)

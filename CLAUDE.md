@@ -66,21 +66,23 @@ P2 module; if it prints `SMOKE TEST PASSED [OK]`, our half is intact.
 
 ## Status
 
-**PAUSED at a clean checkpoint (26 June 2026).** All unblocked Person-2 work is
-done and `python -m scripts.smoke_test` passes. Nothing is half-implemented.
-Remaining work is blocked on Person 1 or the Day-2 freeze (see below).
+**Code-complete (28 June 2026).** Both halves are implemented and verified end to
+end; `python -m scripts.smoke_test` passes. The only thing left is the user
+running the full training on Flickr8k (Colab/GPU) and curating final example ids.
 
-See [STATUS.md](STATUS.md) for the human-readable done/blocked breakdown.
+See [STATUS.md](STATUS.md) for the human-readable breakdown.
 
 - **Done (P2):** `config.py`, `data.py` (incl. `ImageFeatureDataset` for val BLEU),
   `train.py` (real BLEU-4 early stopping), `decode.py`, `evaluate.py`,
-  `notebooks/inference.ipynb` (authored, guarded against missing model),
-  smoke test passing, repo scaffolding (`requirements.txt`, `.gitignore`, README).
-- **Blocked on P1:** real `model.py` to replace the stub; `features.h5` from
-  `precompute_features.py`; encoder transform (`build_image_transform`) for
-  `generate_caption`. Notebook expects `EncoderDecoder(vocab_size, cfg, variant)`
-  and `build_image_transform()` in `src/model.py` / `src/encoder.py`.
-- **Blocked on Day-2 interface freeze:** confirm `decode_step` vs single-`forward`
-  step API; confirm `features.h5` key format; confirm model attribute attachment.
-- **Next for P2:** curate success/failure example ids in `inference.ipynb` (needs
-  trained models); scaffold the training section of `data_and_training.ipynb`.
+  `notebooks/inference.ipynb` (incl. attention-viz section), smoke test passing,
+  repo scaffolding (`requirements.txt`, `.gitignore`, README).
+- **Done (P1, implemented in this repo):** `encoder.py` (frozen ResNet-50 +
+  `build_image_transform`), `decoder_lstm.py` (LSTM + Bahdanau), `decoder_transformer.py`
+  (from-scratch Transformer via custom layers over `nn.MultiheadAttention`),
+  `model.py` (`EncoderDecoder`, drop-in for the stub), `viz.py` (attention heatmaps),
+  `scripts/precompute_features.py` (`features.h5`), `notebooks/data_and_training.ipynb`.
+- **Interface freeze (resolved):** model exposes `decode_step` (stateless, recompute
+  over prefix); `features.h5` keyed by `.jpg` filename; `EncoderDecoder` holds
+  `.encoder`, notebook attaches `.vocab/.device/.image_transform/.beam_size/.max_len`.
+- **Remaining (user):** run `data_and_training.ipynb` on real data to produce
+  `features.h5` + checkpoints, then curate success/failure ids in `inference.ipynb`.
