@@ -30,7 +30,8 @@ notebooks/
   data_and_training.ipynb  data + model + training (loss curves) + save artifacts
   inference.ipynb          generate_caption, demo on unseen images, success/failure
 reports/
-  results.md               metric tables + analysis
+  experiments.md           run/config log to fill in while training (BLEU per config)
+  results.md               metric tables + analysis (written by inference.ipynb)
 ```
 
 ## Install
