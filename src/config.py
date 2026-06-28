@@ -43,7 +43,7 @@ class Config:
     checkpoint_dir: str = field(default="")    # baseline.pt / transformer.pt go here
 
     # ---- vocab ----------------------------------------------------------- #
-    min_word_freq: int = 5
+    min_word_freq: int = 3          # words rarer than this become <unk>
     max_caption_len: int = 22       # tokens between <start> and <end> (incl.)
 
     # ---- shared model dims (the forward() contract) ---------------------- #
