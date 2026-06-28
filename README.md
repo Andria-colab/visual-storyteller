@@ -26,6 +26,7 @@ scripts/
   smoke_test.py            end-to-end Phase-1 test with a stub model (no GPU needed)
   precompute_features.py   cache ResNet features -> features.h5                   (P1)
 notebooks/
+  eda.ipynb                exploratory data analysis (caption / vocab / image stats)
   data_and_training.ipynb  data + model + training (loss curves) + save artifacts
   inference.ipynb          generate_caption, demo on unseen images, success/failure
 reports/
@@ -73,6 +74,9 @@ Colab (images under `/content/flickr8k`, artifacts under
 ## How to run (end to end)
 
 ```bash
+# 0. (optional) explore the dataset
+#    run notebooks/eda.ipynb                (caption / vocab / image statistics)
+
 # 1. cache the frozen ResNet-50 features once (GPU recommended; resumable)
 python -m scripts.precompute_features            # add --colab on Colab
 
