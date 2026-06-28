@@ -81,13 +81,22 @@ class ResNetEncoder(nn.Module):
 def build_image_transform() -> T.Compose:
     """Eval-time transform: PIL.Image -> normalized [3, 224, 224] tensor.
 
-    Canonical ImageNet eval pipeline (resize the short side to 256, center-crop
-    224) so aspect ratio is preserved. No augmentation: the encoder is frozen and
-    features are cached, so train-time augmentation would have no effect.
+    Resize directly to 224x224 (squash, no crop) so NO image content is lost. EDA
+    showed ~68% of Flickr8k images are landscape with aspect ratios up to ~2.8, and
+    a Resize(256)+CenterCrop(224) discards ~20% off each long-axis end on the more
+    elongated third of images — which for captioning can crop out real objects and
+    look like a decoder error. Squashing trades mild aspect-ratio distortion for
+    keeping every object in frame.
+
+    The SAME transform is used by precompute_features.py and generate_caption, so
+    cached and inference-time features always match. If you switch back to the
+    center-crop variant below to A/B it, rebuild features.h5.
     """
     return T.Compose([
-        T.Resize(256),
-        T.CenterCrop(224),
+        T.Resize((224, 224)),                 # squash to square; keeps all content
+        # Alternative — ImageNet-classification default (in-distribution for ResNet
+        # but clips edges on elongated images). Swap in, then rebuild features.h5:
+        # T.Resize(256), T.CenterCrop(224),
         T.ToTensor(),
         T.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
     ])

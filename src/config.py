@@ -55,7 +55,7 @@ class Config:
     num_layers: int = 4             # tune 3-6
     num_heads: int = 8
     ffn_dim: int = 2048
-    dropout: float = 0.1
+    dropout: float = 0.25           # raised from 0.1 — EDA: small, formulaic data (low distinct-2) risks Transformer overfit
 
     # ---- baseline (lstm) ------------------------------------------------- #
     lstm_hidden: int = 512
