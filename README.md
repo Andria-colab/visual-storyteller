@@ -99,7 +99,7 @@ writes the BLEU table to `reports/results.md`.
 The `.pt` checkpoints include a frozen ResNet-50 (~97 MB each) and exceed GitHub's
 file-size limit, so they are hosted on Google Drive:
 
-**[Download from Google Drive →](PASTE_YOUR_DRIVE_LINK_HERE)**
+**[Download from Google Drive →](https://drive.google.com/drive/folders/1D5CqtO7aSdqw9RZ6AUAnjbFqHqAQCsfh?usp=drive_link)**
 
 Contents: `baseline_best.pt` (LSTM, val BLEU-4 0.1908), `transformer_best.pt`
 (Transformer, val BLEU-4 0.2024), `vocab.pkl`, `features.h5`.

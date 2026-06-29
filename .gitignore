@@ -1,7 +1,6 @@
 # data & artifacts (never commit large binaries)
-data/Images/
-data/*.h5
-data/*.csv
+# local data dir: image/caption symlinks, vocab.pkl, features.h5
+data/
 # unzipped Flickr8k dataset (images + captions) and its zip
 caption_data/
 caption_data.zip
