@@ -28,8 +28,8 @@ compare choices and we don't lose numbers between Colab sessions.
 ## Results
 | date | variant | min_freq | dropout | transform | decode | best epoch | val BLEU-4 | test BLEU-4 | notes |
 |---|---|---|---|---|---|---|---|---|---|
-| 2026-06-28 | lstm | 3 | 0.5 | square | beam | 14 | 0.1908 | TBD | baseline; early-stopped ep 19 |
-| 2026-06-29 | transformer | 3 | 0.25 | square | beam | 11 | 0.2024 | TBD | mild overfit ep 12-16; best ckpt saved |
+| 2026-06-28 | lstm | 3 | 0.5 | square | beam | 14 | 0.1908 | 0.202 | baseline; early-stopped ep 19 |
+| 2026-06-29 | transformer | 3 | 0.25 | square | beam | 11 | 0.2024 | 0.209 | mild overfit ep 12-16; best ckpt saved |
 |  |  |  |  |  |  |  |  |  |  |
 |  |  |  |  |  |  |  |  |  |  |
 
