@@ -94,10 +94,23 @@ keeps the best of each model by validation BLEU-4 at `baseline_best.pt` /
 graded `generate_caption(image_path, model) -> str`, visualises attention, and
 writes the BLEU table to `reports/results.md`.
 
+## Trained model weights
+
+The `.pt` checkpoints include a frozen ResNet-50 (~97 MB each) and exceed GitHub's
+file-size limit, so they are hosted on Google Drive:
+
+**[Download from Google Drive →](PASTE_YOUR_DRIVE_LINK_HERE)**
+
+Contents: `baseline_best.pt` (LSTM, val BLEU-4 0.1908), `transformer_best.pt`
+(Transformer, val BLEU-4 0.2024), `vocab.pkl`, `features.h5`.
+
+Place them at `checkpoints/` and `data/` respectively, or use `cfg.use_colab_paths()`
+to point directly at Drive when running on Colab (no download needed).
+
 ## Status
 
-- [x] Data / training / decoding / evaluation pipeline (P2)
-- [x] Encoder + LSTM & Transformer decoders + model wrapper + viz (P1)
-- [x] Feature precompute (`features.h5`)
-- [x] Both notebooks authored; end-to-end smoke test passing
-- [ ] Full training run on Flickr8k + final metric comparison (run the notebooks)
+- [x] Data / training / decoding / evaluation pipeline
+- [x] EDA notebook (`notebooks/eda.ipynb`)
+- [x] Encoder + LSTM & Transformer decoders + model wrapper + viz
+- [x] Feature precompute, both models trained, artifacts on Drive
+- [x] `data_and_training.ipynb` and `inference.ipynb` run end to end
